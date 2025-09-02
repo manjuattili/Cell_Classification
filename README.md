@@ -11,11 +11,16 @@ The objective of this project is to:
 
 ## Data Cleaning and EDA
 - **Data Examination**:
-  - Data was examined to review data types of features, missingness, statistics. Unwanted columns and missing rows were removed after careful consideration of whether the feature will help/make sense to be included in the model. Data type for 'Type' was changed to 'category' from 'object'.
+  - Data was examined to review data types of features, missingness, statistics.
+  - Unwanted columns and missing rows were removed after careful consideration of whether the feature will help/make sense to be included in the model.
+  - Data type for 'Type' was changed to 'category' from 'object'.
 - **Target Variable (`Type`)**:
-  - Target column, 'Type', was examined through bar plots and it was found that the data is heavily imbalanced with principal cell counts close to 60,000 and astrocytes around 4,000 cells.
+  - Target column, 'Type', was examined through bar plots.
+  - It was found that the data is heavily imbalanced with principal cell counts close to 60,000 and astrocytes around 4,000 cells.
 - **Feature Analysis**:
-  - All numerical features were plotted for each class in 'Type' column to examine data distributions. Upon eyeballing, it was noted that most features had distinct distributions. Finally, a correlation map was plotted to understand relationships between the numerical features.
+  - All numerical features were plotted for each class in 'Type' column to examine data distributions.
+  - Upon eyeballing, it was noted that most features had distinct distributions.
+  - Finally, a correlation map was plotted to understand relationships between the numerical features.
 
 ## Model
 - **Algorithm**: Logistic Regression with default parameters (no class weights) was used as a baseline model.
