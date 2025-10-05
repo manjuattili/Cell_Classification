@@ -1,5 +1,14 @@
 # README: Cell Classification Project
 
+# Mouse Brain Cell Type Classification
+
+## Background
+
+Neurons and glia are the two primary cell types in the brain. Neurons are specialized cells responsible for transmitting electrical and chemical signals, enabling functions like thinking, movement, and sensation. They are categorized into types such as principal cells (e.g., pyramidal neurons that form the backbone of neural circuits) and interneurons (which modulate and regulate neuronal activity). Glia, on the other hand, provide support to neurons, including maintenance of homeostasis, insulation (e.g., via myelin), and immune functions. Key glial types include astrocytes (which support synaptic function and blood-brain barrier) and microglia (the brain's immune cells that respond to injury and infection).
+
+This project utilizes 3D reconstructions of these cells to extract morphometric features for classification. The data originates from NeuroMorpho.org, a comprehensive database of digitally reconstructed neurons and glia contributed by researchers worldwide. From NeuroMorpho.org, metadata and morphometric data for mouse brain cells were downloaded. Additionally, SWC files—standardized reconstruction files representing the 3D morphology of cells as a series of connected compartments—were obtained. As part of previous work, these SWC files were processed using geometry formulas to compute local and global angles around each bifurcation point, adding new columns to the dataset. This resulted in a dataset with 53 columns (including metadata, morphometric data, and computed angles) and 141,898 rows. For the classification task, only relevant numerical morphometric features were retained, reducing the dataset to 22 columns after preprocessing.
+
+
 ## Data
 - **Source**: The raw dataset contains 141,896 rows and 52 columns, capturing characteristics of neurons and glia from the mouse brain, derived from 3D reconstructions available at [NeuroMorpho.org](https://neuromorpho.org).
 - **Format**: Cell morphologies were downloaded as SWC files and compiled into a single dataset, with each row representing a single cell.
