@@ -8,15 +8,32 @@ Neurons and glia are the two primary cell types in the brain. Neurons are specia
 
 This project utilizes 3D reconstructions of these cells to extract morphometric features for classification. The data originates from NeuroMorpho.org, a comprehensive database of digitally reconstructed neurons and glia contributed by researchers worldwide. From NeuroMorpho.org, metadata and morphometric data for mouse brain cells were downloaded. Additionally, SWC files—standardized reconstruction files representing the 3D morphology of cells as a series of connected compartments—were obtained. As part of previous work, these SWC files were processed using geometry formulas to compute local and global angles around each bifurcation point, adding new columns to the dataset. This resulted in a dataset with 53 columns (including metadata, morphometric data, and computed angles) and 141,898 rows. For the classification task, only relevant numerical morphometric features were retained, reducing the dataset to 22 columns after preprocessing.
 
+## Overview
 
-## Data
-- **Source**: The raw dataset contains 141,896 rows and 52 columns, capturing characteristics of neurons and glia from the mouse brain, derived from 3D reconstructions available at [NeuroMorpho.org](https://neuromorpho.org).
-- **Format**: Cell morphologies were downloaded as SWC files and compiled into a single dataset, with each row representing a single cell.
+This project aims to classify cell types in the mouse brain using the processed morphometric data from 142,193 cells across 4 imbalanced classes: **astrocyte**, **interneuron**, **microglia**, and **principal**. Initial attempts focused on multiclass classification to distinguish all four types on the highly imbalanced dataset, achieving an accuracy of 82% with Logistic Regression. However, this approach struggled with class imbalance, performing better on majority classes like microglia and principal while underperforming on minorities like astrocytes and interneurons.
 
-## Goal
-The objective of this project is to:
-- Perform **exploratory data analysis (EDA)** to understand the dataset.
-- Use **machine learning algorithms** to classify cells into one of the 4 categories, 'principal', 'interneuron', 'astrocyte', or 'miscroglia', based on morphometric characteristics, such as cell size, number of neurites, number of bifurcations, and bifurcation angles.
+To improve results, the data was modified for binary classification (**Neuron: Yes/No**), combining neuronal types (interneuron and principal) into "Yes" and glial types (astrocyte and microglia) into "No". Four classification algorithms—Logistic Regression, Decision Tree, Random Forest, and XGBoost—were then applied with class balancing techniques, yielding significantly better performance, with XGBoost and Random Forest reaching ~99.7% accuracy.
+
+Key highlights:
+- **Dataset Size**: 135,538 cleaned entries.
+- **Features**: 22 numerical morphometric features (e.g., `bif_ampl_local`, `diameter`, `eucDistance`).
+- **Target**: Binary (`Neuron`: Yes/No) after modification.
+- **Models**: Logistic Regression, Decision Tree, Random Forest, XGBoost (with balanced weights).
+- **Best Performance**: XGBoost and Random Forest achieve ~99.7% accuracy.
+
+This repository contains a Jupyter notebook (`CP-EDA (1).ipynb`) with exploratory data analysis (EDA), preprocessing, model training, evaluation, and a generated report for model comparison.
+
+## Dataset
+
+- **Source**: NeuroMorpho.org (metadata, morphometrics, and SWC reconstruction files).
+- **Original Classes**: 4 imbalanced classes (principal: 59,125; microglia: 56,237; interneuron: 15,980; astrocyte: 4,196).
+- **Binary Modification**: Neuron (Yes: 75,105; No: 60,433).
+- **Features**: Numerical morphometrics like bifurcation angles, branch order, Euclidean distance, fractal dimension, etc.
+- **Preprocessing**:
+  - Dropped columns with high missing values or irrelevant data (e.g., types 1-15, brain regions, domain, gender).
+  - Removed rows with missing target or critical values.
+  - Scaled features using `StandardScaler` post train-test split (80-20) to avoid leakage.
+  - Encoded target with `LabelEncoder`.
 
 ## Data Cleaning and EDA
 - **Data Examination**:
@@ -30,7 +47,13 @@ The objective of this project is to:
   - All numerical features were plotted for each class in 'Type' column to examine data distributions.
   - Upon eyeballing, it was noted that most features had distinct distributions.
   - Finally, a correlation map was plotted to understand relationships between the numerical features.
+EDA includes:
+- Summary statistics.
+- Class distribution plots.
+- Boxplots for features by class.
+- Correlation heatmap.
 
+## Multiclass Classification
 ## Model
 - **Algorithm**: Logistic Regression with default parameters (no class weights) was used as a baseline model.
 - **Features**:
@@ -51,7 +74,6 @@ The test set class distribution is:
 - `microglia`: 11,355 (~41.9%)
 - `interneuron`: 3,121 (~11.5%)
 - `astrocyte`: 878 (~3.2%)
-
 This indicates significant class imbalance, with `principal` and `microglia` dominating, while `astrocyte` and `interneuron` are minority classes, particularly `astrocyte`.
 
 ### Accuracy Score
@@ -99,35 +121,68 @@ principal         53        212        727      10762
   - `principal`: 10,762
 - **Analysis**: Low recall for `astrocyte` (415 misclassified as `microglia`) and `interneuron` (2,664 misclassified as `principal`), indicating difficulty distinguishing minority classes from majority ones.
 
-### Feature Coefficients
-
-```plaintext
-                    astrocyte  interneuron   microglia  principal
-bif_ampl_local     -0.076645    0.475145  -0.615458   0.216957
-bif_ampl_remote    -0.754946   -0.107900   0.919246  -0.056400
-branch_Order       -0.195749    0.020556   0.104588   0.070605
-contraction         0.037888   -0.232588   0.041160   0.153540
-depth              -5.381108   -1.150166   7.869781  -1.338507
-diameter           -0.770627    0.014039   0.939310  -0.182723
-eucDistance        -8.951089   10.261186 -14.741110  13.431013
-fractal_Dim         0.146752   -0.147049  -0.156538   0.156835
-fragmentation      -0.150478   -0.074094   0.290051  -0.065479
-height            -15.621131   13.042885  -7.991352  10.569597
-length              3.850072   -1.910787   0.753901  -2.693185
-n_bifs              0.100680    0.125353  -0.152417  -0.073616
-n_branch            0.097762    0.116343  -0.148725  -0.065381
-n_stems            -0.202960   -0.077259   0.237907   0.042312
-partition_asymmetry 0.267072   -0.207059   0.318207  -0.378220
-pathDistance       -6.276812    4.272901  -2.412223   4.416134
-pk_classic         -0.090134   -1.526386  -0.301553   1.918073
-surface            -0.248590    0.240517  -0.857723   0.865796
-volume              0.208882    0.841510  -2.118085   1.067692
-width               8.746457   -6.709104   3.273382  -5.310735
-local_mean          0.511505    0.188260  -0.083411  -0.616355
-global_mean        -0.105660   -0.349910   0.063159   0.392410
-```
-
-- **High-Impact Features**: Features like height (e.g., -15.62 for astrocyte, 13.04 for interneuron), eucDistance (-8.95 for astrocyte, 13.43 for principal), and width (8.75 for astrocyte, -6.71 for interneuron) have large coefficients, indicating strong influence on class predictions.
+- **High-Impact Features**: Feature coefficients were extracted. It was observed that features like height (e.g., -15.62 for astrocyte, 13.04 for interneuron), eucDistance (-8.95 for astrocyte, 13.43 for principal), and width (8.75 for astrocyte, -6.71 for interneuron) have large coefficients, indicating strong influence on class predictions.
 
 ## Conclusion
 The Logistic Regression model achieves an accuracy of 82.45% but struggles with minority classes (interneuron, astrocyte) due to class imbalance. Using class weights or switching to other algorithms such as Random Forest or XGBoost could improve recall and F1-scores for these classes. Cross-validation and feature selection may further enhance model stability and performance.
+
+## Binary Classification
+## Methods
+
+  - Models trained with class balancing (`class_weight='balanced'` or `scale_pos_weight` for XGBoost) to handle the mild imbalance in the binary setup.
+  - Evaluation metrics: Accuracy, Precision, Recall, F1-Score, Confusion Matrix.
+- **Feature Importance**: Extracted and visualized for each model (absolute coefficients for Logistic Regression; gain-based for others).
+
+## Results
+
+### Model Comparison Report
+
+Dataset Overview: Modified dataset with 135,538 entries, no missing values. Target: `Neuron` (binary: `Yes` for `interneuron` and `principal`, `No` for `astrocyte` and `microglia`). Features: 22 numerical features. Preprocessing: Scaled numerical features after 80-20 train-test split. Models: Logistic Regression, Decision Tree, Random Forest, XGBoost (all with balanced class weights or equivalent).
+
+Class Distribution:
+
+Neuron  
+Yes    75105  
+No     60433  
+
+Model Performance:
+
+| Model                | Accuracy | TP     | FP   | TN     | FN   | Precision (Yes) | Recall (Yes) | F1 (Yes) |
+|----------------------|----------|--------|------|--------|------|-----------------|--------------|----------|
+| Logistic Regression  | 0.9463  | 13794 | 376 | 11857 | 1081| 0.97           | 0.93        | 0.95    |
+| Decision Tree        | 0.9871  | 14687 | 162 | 12071 | 188 | 0.99           | 0.99        | 0.99    |
+| Random Forest        | 0.9956  | 14822 | 65  | 12168 | 53  | 1.00           | 1.00        | 1.00    |
+| XGBoost              | 0.9972  | 14832 | 32  | 12201 | 43  | 1.00           | 1.00        | 1.00    |
+
+- **Top Features**: `eucDistance`, `height`, `pathDistance`, `width` consistently rank high across models.
+- **Visualizations**: Class distributions, boxplots, correlation heatmap, feature importance bars.
+
+Multiclass Results (Logistic Regression): ~82% accuracy; better for majority classes (microglia: 93% F1, principal: 84% F1).
+
+### Top 3 Features by Model
+
+| Model                | Rank 1 (Importance)     | Rank 2 (Importance)   | Rank 3 (Importance)   |
+|----------------------|-------------------------|-----------------------|-----------------------|
+| Logistic Regression  | eucDistance (1.0000)   | height (0.8438)      | width (0.4239)       |
+| Decision Tree        | eucDistance (0.7903)   | n_bifs (0.0328)      | diameter (0.0236)    |
+| Random Forest        | height (0.1999)        | eucDistance (0.1968) | pathDistance (0.1587)|
+| XGBoost              | eucDistance (0.7677)   | n_bifs (0.0458)      | height (0.0212)      |
+
+## Conclusion
+
+This project demonstrates the efficacy of machine learning in classifying mouse brain cell types based on morphometric features derived from 3D reconstructions. The initial multiclass approach highlighted challenges with class imbalance, achieving only 82% accuracy with Logistic Regression, underscoring the difficulty in distinguishing fine-grained subtypes like astrocytes and interneurons. By reframing the problem as binary classification between neurons and glia, performance improved dramatically, with ensemble methods like Random Forest and XGBoost attaining near-perfect accuracy (~99.7%). This suggests that morphometric differences are more pronounced at the neuron-glia level, making binary classification a more robust strategy for such datasets.
+
+Key insights include the prominence of spatial and structural features such as eucDistance, height, and pathDistance across models, which likely capture the elongated, arborized morphology of neurons versus the more compact structure of glia. These features—along with other top-ranked ones like n_bifs, diameter, and width—are derived from standard neuromorphological metrics used in analyzing 3D reconstructions of brain cells (e.g., via tools like L-Measure from NeuroMorpho.org). They quantify aspects of cellular geometry, branching, and spatial extent, which differ markedly between neurons and glia due to their functional roles. For instance, eucDistance (Euclidean Distance) measures the maximum straight-line distance from the soma to the farthest tip of the cellular arbor, reflecting neurons' extensive dendritic and axonal spans for signal integration over distances, while glia remain localized. Similarly, height captures the vertical extent along a predefined axis, highlighting neurons' apical-basal polarity (e.g., in pyramidal cells), and pathDistance quantifies the longest tortuous path along branches, emphasizing neurons' winding arbors for connectivity versus glia's shorter processes.
+
+Furthermore, n_bifs (Number of Bifurcations) counts branch points, indicating neurons' higher branching complexity for synaptic surface area; diameter represents branch thickness, with neurons often having varied calibers for efficient conduction compared to glia's finer extensions; and width measures lateral spread, underscoring neurons' broad dendritic fields for input sampling. Collectively, these features highlight how neurons' morphology is adapted for information processing and transmission over distances, resulting in larger spatial extents and greater complexity, while glia prioritize local interactions with simpler structures. This aligns with evolutionary pressures: neurons form expansive networks for cognition, whereas glia provide on-site support like nutrient delivery (astrocytes) or debris clearance (microglia). The models' reliance on these metrics suggests that simple geometric descriptors from 3D reconstructions can serve as robust biomarkers for automated classification, potentially accelerating neuroscience research by enabling high-throughput analysis of cell types in brain atlases. However, variations within classes (e.g., bushy vs. elongated astrocytes) could explain residual errors, emphasizing the need for context-aware interpretations in biological applications. These findings have implications for neuroscience, potentially aiding automated cell type identification in large-scale brain mapping efforts. Future work could explore incorporating additional features from SWC files, addressing remaining imbalances with advanced techniques like SMOTE, or applying deep learning algorithms on a larger dataset.
+
+## Acknowledgments
+
+- Data sourced from NeuroMorpho.org.
+- Built with scikit-learn and XGBoost for modeling.
+
+
+
+
+
+
