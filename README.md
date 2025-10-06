@@ -119,9 +119,7 @@ principal         53        212        727      10762
   - `interneuron`: 242
   - `microglia`: 10,952
   - `principal`: 10,762
-- **Analysis**: Low recall for `astrocyte` (415 misclassified as `microglia`) and `interneuron` (2,664 misclassified as `principal`), indicating difficulty distinguishing minority classes from majority ones.
-
-- **High-Impact Features**: Feature coefficients were extracted. It was observed that features like height (e.g., -15.62 for astrocyte, 13.04 for interneuron), eucDistance (-8.95 for astrocyte, 13.43 for principal), and width (8.75 for astrocyte, -6.71 for interneuron) have large coefficients, indicating strong influence on class predictions.
+- **Analysis**: Low recall for `astrocyte` (415 misclassified as `microglia`) and `interneuron` (2,664 misclassified as `principal`), indicating difficulty distinguishing minority classes from majority ones. It was observed that features like height (e.g., -15.62 for astrocyte, 13.04 for interneuron), eucDistance (-8.95 for astrocyte, 13.43 for principal), and width (8.75 for astrocyte, -6.71 for interneuron) have large coefficients, indicating strong influence on class predictions.
 
 ## Conclusion
 The Logistic Regression model achieves an accuracy of 82.45% but struggles with minority classes (interneuron, astrocyte) due to class imbalance. Using class weights or switching to other algorithms such as Random Forest or XGBoost could improve recall and F1-scores for these classes. Cross-validation and feature selection may further enhance model stability and performance.
